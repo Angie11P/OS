@@ -1,0 +1,51 @@
+#include <LiquidCrystal.h> // Incluir la librería para controlar el LCD
+
+// Definir los pines para el LCD
+LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+
+// Definir los pines para los componentes
+int sensorPin = 0; // Pin para el sensor de temperatura TMP36
+int ledPin = 13; // Pin para el LED
+int motorPin = 9; // Pin para el motor (ventilador)
+
+void setup() {
+  // Configurar los pines como salida
+  pinMode(ledPin, OUTPUT);
+  pinMode(motorPin, OUTPUT);
+
+  // Inicializar el LCD
+  lcd.begin(16, 2);
+}
+
+void loop() {
+  // Leer el valor del sensor de temperatura
+  int sensorValue = analogRead(sensorPin);
+  float voltage = (sensorValue * 5.0) / 1024.0;
+  float temperature = (voltage - 0.5) * 100;
+
+  // Mostrar la temperatura en el LCD
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Temperatura: ");
+  lcd.print(temperature);
+  lcd.print(" C");
+
+  // Validación 1: Temperatura <= 10 °C
+  if (temperature <= 10) {
+    digitalWrite(ledPin, HIGH); // Encender el LED
+    delay(500); // Esperar 0.5 segundos
+    digitalWrite(ledPin, LOW); // Apagar el LED
+    delay(500); // Esperar 0.5 segundos
+    digitalWrite(motorPin, LOW); // Apagar el motor
+  }
+  // Validación 2: 11 °C <= Temperatura <= 25 °C
+  else if (temperature >= 11 && temperature <= 25) {
+    digitalWrite(ledPin, LOW); // Apagar el LED
+    digitalWrite(motorPin, LOW); // Apagar el motor
+  }
+  // Validación 3: Temperatura >= 26 °C
+  else {
+    digitalWrite(ledPin, HIGH); // Encender el LED
+    digitalWrite(motorPin, HIGH); // Encender el motor
+  }
+}
